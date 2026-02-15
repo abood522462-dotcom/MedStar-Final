@@ -8,13 +8,16 @@ import google.generativeai as genai
 
 
 # --- إعدادات Gemini AI ---
-# GEMINI_API_KEY = "AIzaSyB0xTDwW71QdWdjOR2ykIWw5XwI9-SMWh8" 
-try:
-    genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
-    # في ملف app.py سطر 12
-    model = genai.GenerativeModel('gemini-flash-latest')
-except:
-    print("Warning: Gemini API Key is missing.")
+# تأكد إن السطر ده في أول الملف فوق خالص: import os
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
+
+if GOOGLE_API_KEY:
+    genai.configure(api_key=GOOGLE_API_KEY)
+    # جرب نستخدم الإصدار الأحدث والأكثر استقراراً
+    model = genai.GenerativeModel('gemini-1.5-flash')
+else:
+    print("Warning: GOOGLE_API_KEY not found in environment variables.")
+    model = None
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
