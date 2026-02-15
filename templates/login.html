@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - MedStar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <style>
+        .navbar__btn { font-family: "Poppins", sans-serif; color: var(--white-color); outline: none; border: none; padding: 0.7rem 1.8rem; border-radius: 25px; background: linear-gradient(to right, var(--dark-blue), var(--light-blue)); font-weight: 400; cursor: pointer; display: inline-block; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; }
+        .navbar__btn:hover { border: 1px solid var(--dark-blue); color: var(--dark-blue); background: transparent; }
+        
+        /* الستايل الخاص بالفورم */
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+        .auth-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; padding: 5rem 1rem; background-color: var(--very-light-blue); }
+        .auth-form { background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .auth-form h2 { text-align: center; margin-bottom: 1.5rem; color: var(--secondary-color); }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: var(--secondary-color); }
+        .form-group input { width: 100%; padding: 0.7rem; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .auth-form button { width: 100%; padding: 0.8rem; }
+        
+        /* ================== (1) (هذا هو الكود اللي كان ناقص) ================== */
+        /* (الستايل الخاص بالجملة اللي تحت) */
+        .auth-form p {
+            text-align: center; /* (1. خليها في النص) */
+            margin-top: 1.5rem; /* (2. ضيف مسافة فوقيها) */
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+        .auth-form p a {
+            color: var(--dark-blue);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .auth-form p a:hover {
+            text-decoration: underline;
+        }
+        /* ================== (انتهى الكود) ================== */
+
+    </style>
+</head>
+<body>
+    
+    <header>
+       <nav class="navbar">
+        <div class="navbar__container container">   
+            <div class="navbar__logo">
+                <a href="{{ url_for('home') }}"><h3>Med<span>Star</span></h3></a>
+                <img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt="logo-icon">
+            </div>
+            <ul class="navbar__links" id="navbar">
+                <li> <a href="{{ url_for('home') }}">Home</a></li>
+                <li> <a href="{{ url_for('show_services') }}">Services</a></li>
+                <!-- <li> <a href="{{ url_for('show_all_departments') }}">Departments</a></li> -->
+                <li> <a href="{{ url_for('my_appointments') }}">Appointments</a></li>
+                <li> <a href="{{ url_for('show_about') }}">About</a></li>
+                <li> <a href="{{ url_for('show_contact') }}">Contact</a></li>
+            </ul>
+            
+            {% if current_user.is_authenticated %}
+                <span style="color: var(--secondary-color); margin-right: 1rem;">Welcome, {{ current_user.username }}!</span>
+                <form action="{{ url_for('logout') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Logout</button>
+                </form>
+            {% else %}
+                <form action="{{ url_for('login') }}" method="GET" style="margin: 0; margin-right: 0.5rem;">
+                    <button type="submit" class="navbar__btn">Login or Sign UP</button>
+                </form>
+                <!-- <form action="{{ url_for('register') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Register</button>
+                </form> -->
+            {% endif %}
+
+        </div>
+       </nav>
+     </header>
+
+    <main class="auth-container">
+        <form class="auth-form" method="POST">
+            <h2>Login to Your Account</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div style="padding: 1rem; margin-bottom: 1rem; border-radius: 5px; background-color: {% if category == 'danger' %}#f8d7da{% else %}#d4edda{% endif %}; color: {% if category == 'danger' %}#721c24{% else %}#155724{% endif %};">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit">Login</button>
+
+            <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+            </form>
+    </main>
+
+</body>
+</html>

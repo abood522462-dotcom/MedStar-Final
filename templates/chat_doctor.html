@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - MedStar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <style>
+        .navbar__btn { font-family: "Poppins", sans-serif; color: var(--white-color); outline: none; border: none; padding: 0.7rem 1.8rem; border-radius: 25px; background: linear-gradient(to right, var(--dark-blue), var(--light-blue)); font-weight: 400; cursor: pointer; display: inline-block; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; }
+        .navbar__btn:hover { border: 1px solid var(--dark-blue); color: var(--dark-blue); background: transparent; }
+    
+        /* ================== (1) (هذا هو الستايل الجديد) ================== */
+        
+        body {
+            background-color: var(--very-light-blue); 
+        }
+
+        .chat-page-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem 1rem;
+            min-height: calc(100vh - 80px); 
+            box-sizing: border-box;
+        }
+
+        .chat-window {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 1000px; /* (العرض الكبير) */
+            height: 70vh; 
+            display: flex; 
+            flex-direction: column;
+            overflow: hidden; 
+        }
+        
+        /* (1. الهيدر بتاع الشات) */
+        .chat-header {
+            background-color: #fff;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        .chat-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 1rem;
+        }
+        .chat-header h3 {
+            color: var(--secondary-color);
+            margin: 0;
+        }
+        .chat-header p {
+            margin: 0;
+            color: #70e000; 
+            font-size: 0.9rem;
+        }
+
+        /* (2. جسم الشات - الرسايل) */
+        .chat-body {
+            flex-grow: 1; 
+            padding: 1.5rem;
+            overflow-y: auto; 
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .chat-message {
+            padding: 0.8rem 1rem;
+            border-radius: 15px;
+            max-width: 70%;
+            line-height: 1.5;
+        }
+        
+        .received {
+            background-color: #f1f1f1;
+            color: #333;
+            border-bottom-left-radius: 0;
+            align-self: flex-start; 
+        }
+        
+        .sent {
+            background: var(--dark-blue);
+            color: #fff;
+            border-bottom-right-radius: 0;
+            align-self: flex-end; 
+        }
+
+        /* (3. الفوتر - مكان الكتابة) */
+        .chat-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #eee;
+            background: #f9f9f9;
+            display: flex;
+            gap: 1rem;
+        }
+        .chat-footer input {
+            flex-grow: 1; /* (ده اللي هيخليه يملى الكارد) */
+            padding: 0.8rem; 
+            border: 1px solid #ccc; 
+            border-radius: 20px; 
+            box-sizing: border-box; 
+            font-family: "Poppins", sans-serif;
+        }
+        .chat-footer button {
+            width: auto;
+        }
+        /* ================== (انتهى الستايل الجديد) ================== */
+
+    </style>
+</head>
+<body>
+    
+    <header>
+       <nav class="navbar">
+        <div class="navbar__container container">   
+            <div class="navbar__logo">
+                <a href="{{ url_for('home') }}"><h3>Med<span>Star</span></h3></a>
+                <img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt="logo-icon">
+            </div>
+            <ul class="navbar__links" id="navbar">
+            <li> <a href="{{ url_for('home') }}">Home</a></li>
+            <li> <a href="{{ url_for('show_services') }}">Services</a></li>
+            <!-- <li> <a href="{{ url_for('show_all_departments') }}">Departments</a></li> -->
+            <li> <a href="{{ url_for('my_appointments') }}">Appointments</a></li>
+            <li> <a href="{{ url_for('show_about') }}">About</a></li>
+            <li> <a href="{{ url_for('show_contact') }}">Contact</a></li>
+            </ul>
+            
+            {% if current_user.is_authenticated %}
+                <span style="color: var(--secondary-color); margin-right: 1rem;">Welcome, {{ current_user.username }}!</span>
+                <form action="{{ url_for('logout') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Logout</button>
+                </form>
+            {% else %}
+                <form action="{{ url_for('login') }}" method="GET" style="margin: 0; margin-right: 0.5rem;">
+                    <button type="submit" class="navbar__btn">Login or Sign UP</button>
+                </form>
+                <!-- <form action="{{ url_for('register') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Register</button>
+                </form> -->
+            {% endif %}
+        </div>
+       </nav>
+     </header>
+    
+    <main class="chat-page-wrapper">
+        
+        <div class="chat-window">
+            
+            <div class="chat-header">
+                <img src="{{ url_for('static', filename='img/default_doctor.png') }}" alt="Doctor">
+                <div>
+                    <h3>Support Team</h3>
+                    <p>Online</p>
+                </div>
+            </div>
+            
+            <div class="chat-body">
+                
+                {% for message in chat_history %}
+                    {% if message.type == 'sent' %}
+                        <div class="chat-message sent">
+                            {{ message.text }}
+                        </div>
+                    {% else %}
+                        <div class="chat-message received">
+                            {{ message.text }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                
+            </div>
+            
+            <form class="chat-footer" method="POST">
+                <input type="text" name="message_text" placeholder="Type your message..." required>
+                <button type="submit" class="navbar__btn">Send</button>
+            </form>
+            </div>
+        </main>
+
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" dir="{{ dir }}"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,900&display=swap" rel="stylesheet">
+    <title>MedStar</title>
+
+    <style>
+        .navbar__btn { font-family: "Poppins", sans-serif; color: var(--white-color); outline: none; border: none; padding: 0.7rem 1.8rem; border-radius: 25px; background: linear-gradient(to right, var(--dark-blue), var(--light-blue)); font-weight: 400; cursor: pointer; display: inline-block; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; }
+        .navbar__btn:hover { border: 1px solid var(--dark-blue); color: var(--dark-blue); background: transparent; }
+    </style>
+</head>
+<body>
+    <header>
+       <nav class="navbar">
+        <div class="navbar__container container">   
+        <div class="navbar__logo">
+            <a href="{{ url_for('home') }}"><h3>Med<span>Star</span></h3></a>
+            <img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt="logo-icon">
+        </div>
+        <ul class="navbar__links" id="navbar">
+            <li> <a href="{{ url_for('home') }}">Home</a></li>
+            <li> <a href="{{ url_for('show_services') }}">Services</a></li>
+            <!-- <li> <a href="{{ url_for('show_all_departments') }}">Departments</a></li> -->
+            <li> <a href="{{ url_for('my_appointments') }}">Appointments</a></li>
+            <li> <a href="{{ url_for('show_about') }}">About</a></li>
+            <li> <a href="{{ url_for('show_contact') }}">Contact</a></li>
+            </ul>
+
+        {% if current_user.is_authenticated %}
+            <span style="color: var(--secondary-color); margin-right: 1rem;">Welcome, {{ current_user.username }}!</span>
+            <form action="{{ url_for('logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="navbar__btn">Logout</button>
+            </form>
+        {% else %}
+            <form action="{{ url_for('login') }}" method="GET" style="margin: 0; margin-right: 0.5rem;">
+                <button type="submit" class="navbar__btn">Login or Sign Up</button>
+            </form>
+            <!-- <form action="{{ url_for('register') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="navbar__btn">Register</button>
+            </form> -->
+        {% endif %}
+
+       </div>
+       </nav>
+     </header>
+
+     <main>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="container" style="padding-top: 1rem;"> 
+                {% for category, message in messages %}
+                    <div style="padding: 1rem; margin-bottom: 1rem; border-radius: 5px; background-color: {% if category == 'danger' %}#f8d7da{% else %}#d4edda{% endif %}; color: {% if category == 'danger' %}#721c24{% else %}#155724{% endif %};">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <section class="hero">
+            <div class="hero__container container">
+                <div class="hero__left">
+                    <h1>
+                        We Are Ready To <br>
+                        <span class="gradient-color">Help Your Health</span> <br>
+                        Problems
+                    </h1>
+                    <p>
+                        In times like today , your healthy is very important , espicially
+                        since the number of covid-19 cases is increasing day by day , so we  
+                        are ready to help you with your health consultation. 
+                    </p>
+                    <a href="{{ url_for('ai_consult') }}" class="navbar__btn" style="margin-top: 1rem;"> Free Consultation With AI</a>
+                    <div class="hero__stats">
+                         <div> <h2>20 <span>+</span></h2> <p>Active Doctor</p> </div>
+                         <div> <h2>15K <span>+</span></h2> <p>Active Users</p> </div>
+                         <div> <h2>5 <span>+</span></h2> <p>Active Pharmacys</p> </div>
+                    </div>
+                </div>
+                <div class="hero__right">
+                    <img src="{{ url_for('static', filename='img/hero.png') }}" alt="hero image">
+                </div>
+            </div>
+        </section>x
+<!-- 
+        <section class="clients">
+            <div class="clients__container container">
+                
+                <a href="https://www.fwd.com/en/" target="_blank" rel="noopener noreferrer">
+                    <img src="{{ url_for('static', filename='img/client-1.png') }}" alt="FWD Logo">
+                </a>
+                
+                <a href="https://www.blibli.com/" target="_blank" rel="noopener noreferrer">
+                    <img src="{{ url_for('static', filename='img/client-2.png') }}" alt="Blibli Logo">
+                </a>
+
+                <a href="https://www.allianz.com/en.html" target="_blank" rel="noopener noreferrer">
+                    <img src="{{ url_for('static', filename='img/client-3.png') }}" alt="Allianz Logo">
+                </a>
+
+                <a href="https://www.bcalife.co.id/" target="_blank" rel="noopener noreferrer">
+                    <img src="{{ url_for('static', filename='img/client-4.png') }}" alt="BCA Life Logo">
+                </a>
+
+                <a href="https://www.manulife.com/" target="_blank" rel="noopener noreferrer"> 
+                    <img src="{{ url_for('static', filename='img/client-5.png') }}" alt="Manulife Logo">
+                </a>
+                
+            </div> -->
+        </section>    
+        <section class="services">
+            <h2>Our <span class="gradient-color">Main Services</span> <br> Categories</br> </h2>
+            <div class="services__container container">
+                <article class="services__card">
+                    <div class="services__img">
+                        <img src="{{ url_for('static', filename='img/doctor.png') }}" alt="Chat with Doctor">
+                    </div>
+                    <h3>Chat With Us</h3>
+                    <p>
+                        You can connect directly , quickly and easily , and there is no need to doubt the 
+                        quality of the consultation and treatment offered.
+                    </p>
+                    <a href="{{ url_for('show_chat_doctor') }}" class="navbar__btn" style="margin-top: 1rem;"> Start Chat </a>
+                </article>
+                <article class="services__card">
+                    <div class="services__img">
+                        <img src="{{ url_for('static', filename='img/health.png') }}" alt="Health Store">
+                    </div>
+                    <h3>Health Store</h3>
+                    <p>
+                        Discover our range of natural supplements, organic foods, and wellness products.
+                    </p>
+                    <a href="{{ url_for('show_pharmacy') }}" class="navbar__btn" style="margin-top: 1rem;"> Go To Store</a>
+                </article>
+                <article class="services__card">
+                    <div class="services__img">
+                        <img src="{{ url_for('static', filename='img/hospital.png') }}" alt="Visit Hospital">
+                    </div>
+                    <h3>Visit Hospital</h3>
+                    <p>
+                        View all our available departments and specialized doctors.
+                    </p>
+                    <a href="{{ url_for('show_all_departments') }}" class="navbar__btn" style="margin-top: 1rem;"> View Departments </a>
+                </article>
+            </div>
+         </section>
+          <section class="special">
+            <div class="special__container container">
+                <div class="special__left">
+                    <img src="{{ url_for('static', filename='img/special.png') }}" alt="special img">
+                </div>
+                <div class="special__right">
+                    <h2>Our <span class="gradient-color">Special Services</span></h2>
+                    <p>
+                        Join our community and take control of your health today. Register now to book appointments, consult with specialists, and access all our digital health services.
+                    </p>
+                    <div class="special__services-container">
+                         <div>
+                            <div class="special__services-img">
+                                <img src="{{ url_for('static', filename='img/covid.png') }}" alt="covid test">
+                            </div>
+                            <h3>Covid-19 Test</h3>
+                            <p>Get accurate and fast results for your Covid-19 test. We offer both PCR and rapid antigen testing options.</p>
+                         </div>
+                         <div>
+                            <div class="special__services-img">
+                                <img src="{{ url_for('static', filename='img/supplement.png') }}" alt="covid test">
+                            </div>
+                            <h3>Herbal Supplement</h3>
+                            <p>Browse our curated selection of natural herbal supplements. Support your wellness journey with high-quality vitamins.</p>
+                         </div>
+                         <div>
+                            <div class="special__services-img">
+                                <img src="{{ url_for('static', filename='img/flask.png') }}" alt="covid test">
+                            </div>
+                            <h3>Laboratorium test</h3>
+                            <p>Schedule your lab tests online. From routine blood work to specialized panels, get reliable results quickly.</p>
+                         </div>
+                         <div>
+                            <div class="special__services-img">
+                                <img src="{{ url_for('static', filename='img/schedule.png') }}" alt="covid test">
+                            </div>
+                            <h3>Menstruation Calender</h3>
+                            <p>Track your cycle with our easy-to-use menstruation calendar. Monitor your period and log symptoms.</p>
+                         </div>
+                    </div>
+                </div>
+            </div>
+          </section>
+
+           <section class="doctors">
+            <div class="doctors__container container">
+                <div class="doctors__left">
+                    <h3>Our Doctors</h3>
+                    <h2 class="gradient-color"> Quilified Doctors </h2>
+                    <p>Handled directly by general doctors and professional and 
+                        experinced specialist doctors
+                    </p>
+                   {% for doc in doctors %}
+                   <div class="doctors__card">
+                    <p>{{ doc.department.name }}</p>
+                    <h2>{{ doc.name }}</h2>
+                    <p>{{ doc.specialty }}</p>
+                   </div>
+                   {% endfor %} 
+                   <form action="{{ url_for('show_doctors') }}" method="GET" style="margin-top: 1.5rem;">
+                       <button type="submit">View All Doctors</button>
+                   </form>
+                </div>
+                <div class="doctors__right">
+                    <img src="{{ url_for('static', filename='img/doctors.png') }}" alt="doctors">
+                </div>
+            </div>
+           </section>
+            <section class="ctn">
+                <div class="ctn__container container">
+                    <h2>Get <span class="gradient-color">started with MedStar</span></h2>
+                    <p>
+                        Join our community and take control of your health today. Register now to book appointments, consult with specialists, and access all our digital health services.
+                    </p>
+                    <!-- <button>Lets Get Started</button> -->
+                    <!-- <span>Copyright @ 2026 . Created By Vontex Team</span> -->
+                </div>
+            </section>
+     </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <footer style="background: var(--dark-blue); color: white; padding: 3rem 2rem; margin-top: auto;">
+    <div class="container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+        
+        <div>
+            <h2 style="color: var(--light-blue); margin-bottom: 1rem;">MedStar</h2>
+            <p style="font-size: 0.9rem; opacity: 0.8; line-height: 1.6;">
+                Your trusted partner in health. providing top-notch medical services with advanced AI technology.
+            </p>
+        </div>
+
+        <div>
+            <h3 style="margin-bottom: 1rem;">Quick Links</h3>
+            <ul style="list-style: none; padding: 0;">
+                <li><a href="{{ url_for('home') }}" style="color: white; text-decoration: none; opacity: 0.8; display: block; margin-bottom: 0.5rem;">Home</a></li>
+                <li><a href="{{ url_for('show_services') }}" style="color: white; text-decoration: none; opacity: 0.8; display: block; margin-bottom: 0.5rem;">Services</a></li>
+                <li><a href="{{ url_for('show_pharmacy') }}" style="color: white; text-decoration: none; opacity: 0.8; display: block; margin-bottom: 0.5rem;">Pharmacy</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 style="margin-bottom: 1rem;">Contact Us</h3>
+            <p style="opacity: 0.8; margin-bottom: 0.5rem;">📍 Cairo, Egypt</p>
+            <p style="opacity: 0.8; margin-bottom: 0.5rem;">📞 +20 123 456 789</p>
+            <p style="opacity: 0.8;">📧 info@medstar.com</p>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+        <p style="font-size: 0.8rem; opacity: 0.6;">&copy; 2026 MedStar. All rights reserved. Designed by <strong>Abdo</strong></p>
+    </div>
+</footer>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1000, // مدة الحركة (ثانية)
+    once: true      // الحركة تحصل مرة واحدة بس
+  });
+</script>
+
+</body>
+</html>

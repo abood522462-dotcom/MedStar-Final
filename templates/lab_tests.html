@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Tests - MedStar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <style>
+        .navbar__btn { font-family: "Poppins", sans-serif; color: var(--white-color); outline: none; border: none; padding: 0.7rem 1.8rem; border-radius: 25px; background: linear-gradient(to right, var(--dark-blue), var(--light-blue)); font-weight: 400; cursor: pointer; display: inline-block; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; }
+        .navbar__btn:hover { border: 1px solid var(--dark-blue); color: var(--dark-blue); background: transparent; }
+
+        /* (ده نفس الستايل بتاع صفحة "الأقسام" عشان التصميم الرايق) */
+        .services__container {
+            display: grid;
+            /* (غيرنا هنا عشان 12 تحليل، ممكن 4 في الصف) */
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 1.5rem; /* (قللنا المسافة شوية) */
+        }
+        
+        .services__card {
+            background: #fff;
+            padding: 1.5rem; /* (قللنا البادينج) */
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .services__card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .services__img {
+            margin-inline: auto;
+            width: 7rem; /* (صغرنا الأيقونة شوية) */
+            height: 7rem; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .services__img img {
+            max-width: 80px; /* (حجم الأيقونة) */
+            max-height: 80px;
+        }
+        
+        .services__card h3 {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem; /* (صغرنا الخط) */
+        }
+        .services__card p {
+            color: var(--primary-color);
+            font-size: 0.85rem; /* (صغرنا الخط) */
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            min-height: 70px; /* (عشان الكروت تبقى قد بعض) */
+        }
+        
+        /* (ستايل "السعر") */
+        .test-price {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        @media screen and (max-width: 900px) {
+            .services__container {
+                grid-template-columns: 1fr 1fr; 
+            }
+        }
+        @media screen and (max-width: 600px) {
+            .services__container {
+                grid-template-columns: 1fr; 
+            }
+        }
+
+    </style>
+</head>
+<body>
+    
+    <header>
+       <nav class="navbar">
+        <div class="navbar__container container">   
+            <div class="navbar__logo">
+                <a href="{{ url_for('home') }}"><h3>Med<span>Star</span></h3></a>
+                <img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt="logo-icon">
+            </div>
+            <ul class="navbar__links" id="navbar">
+                <li> <a href="{{ url_for('home') }}">Home</a></li>
+                <li> <a href="{{ url_for('show_services') }}">Services</a></li>
+                <!-- <li> <a href="{{ url_for('show_all_departments') }}">Departments</a></li>  -->
+                <li> <a href="{{ url_for('my_appointments') }}">Appointments</a></li>
+                <li> <a href="{{ url_for('show_about') }}">About</a></li>
+                <li> <a href="{{ url_for('show_contact') }}">Contact</a></li>
+            </ul>
+            
+            {% if current_user.is_authenticated %}
+                <span style="color: var(--secondary-color); margin-right: 1rem;">Welcome, {{ current_user.username }}!</span>
+                <form action="{{ url_for('logout') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Logout</button>
+                </form>
+            {% else %}
+                <form action="{{ url_for('login') }}" method="GET" style="margin: 0; margin-right: 0.5rem;">
+                    <button type="submit" class="navbar__btn">Login or Sign Up</button>
+                </form>
+                <!-- <form action="{{ url_for('register') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Register</button>
+                </form> -->
+            {% endif %}
+
+        </div>
+       </nav>
+     </header>
+
+    <main class="container" style="padding-top: 4rem; padding-bottom: 4rem;">
+        
+        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 2rem;">
+            Available <span class="gradient-color">Lab Tests</span>
+        </h2>
+        
+        <div class="services__container container">
+            
+            {% for test in tests %}
+            <article class="services__card">
+                <div class="services__img">
+                    <img src="{{ url_for('static', filename='img/' + test.icon_url) }}" alt="{{ test.name }} Icon">
+                </div>
+                
+                <h3>{{ test.name }}</h3>
+                <p>{{ test.description }}</p>
+                
+                <div class="test-price">{{ test.price }}</div>
+                
+                <a href="{{ url_for('book_service', service_type='lab', service_id=test.id) }}" class="navbar__btn" ...>Book This Test</a>
+                
+            </article>
+            {% endfor %} 
+            
+        </div>
+        
+    </main>
+
+</body>
+</html>

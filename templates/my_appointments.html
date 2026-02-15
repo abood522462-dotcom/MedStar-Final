@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Appointments - MedStar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <style>
+        .navbar__btn { font-family: "Poppins", sans-serif; color: var(--white-color); outline: none; border: none; padding: 0.7rem 1.8rem; border-radius: 25px; background: linear-gradient(to right, var(--dark-blue), var(--light-blue)); font-weight: 400; cursor: pointer; display: inline-block; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; }
+        .navbar__btn:hover { border: 1px solid var(--dark-blue); color: var(--dark-blue); background: transparent; }
+        
+        .appointment-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--dark-blue); 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .appt-info h3 { margin: 0 0 0.5rem 0; color: var(--secondary-color); font-size: 1.2rem; }
+        .appt-info p { margin: 0; color: var(--primary-color); font-size: 0.9rem; }
+        
+        .appt-time { text-align: right; }
+        .appt-time .date { font-weight: bold; color: var(--secondary-color); font-size: 1.1rem; }
+        .appt-time .time { color: var(--primary-color); }
+        .appt-status { color: green; font-size: 0.9rem; font-weight: bold; }
+        
+        .appt-badge {
+            background-color: var(--very-light-blue);
+            color: var(--dark-blue);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    
+    <header>
+       <nav class="navbar">
+        <div class="navbar__container container">   
+            <div class="navbar__logo">
+                <a href="{{ url_for('home') }}"><h3>Med<span>Star</span></h3></a>
+                <img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt="logo-icon">
+            </div>
+            <ul class="navbar__links" id="navbar">
+                <li> <a href="{{ url_for('home') }}">Home</a></li>
+                <li> <a href="{{ url_for('show_services') }}">Services</a></li>
+                <li> <a href="{{ url_for('show_all_departments') }}">Departments</a></li>
+                <li> <a href="{{ url_for('my_appointments') }}">My Appointments</a></li>
+            </ul>
+            
+            {% if current_user.is_authenticated %}
+                <span style="color: var(--secondary-color); margin-right: 1rem;">Welcome, {{ current_user.username }}!</span>
+                <form action="{{ url_for('logout') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Logout</button>
+                </form>
+            {% else %}
+                <form action="{{ url_for('login') }}" method="GET" style="margin: 0; margin-right: 0.5rem;">
+                    <button type="submit" class="navbar__btn">Login</button>
+                </form>
+                <form action="{{ url_for('register') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Register</button>
+                </form>
+            {% endif %}
+        </div>
+       </nav>
+     </header>
+
+    <main class="container" style="padding: 4rem 2rem;">
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="padding: 1rem; margin-bottom: 1rem; border-radius: 5px; background-color: {% if category == 'danger' or category == 'warning' %}#f8d7da{% else %}#d4edda{% endif %}; color: {% if category == 'danger' or category == 'warning' %}#721c24{% else %}#155724{% endif %}; text-align: center;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 2rem; color: var(--secondary-color);">
+            My <span class="gradient-color">Appointments</span>
+        </h2>
+        
+        {% if appointments %}
+            <div class="appointments-list">
+                {% for appt in appointments %}
+                <div class="appointment-card">
+                    <div class="appt-info">
+                        <span class="appt-badge">{{ appt.service_type }}</span>
+                        <h3>{{ appt.service_name }}</h3>
+                        <p>{{ appt.service_details }}</p>
+                        {% if appt.visit_type %}
+                            <p style="font-size: 0.8rem; color: #666;">Type: {{ appt.visit_type }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="appt-time">
+                        <div class="date">{{ appt.date }}</div>
+                        <div class="time">{{ appt.time }}</div>
+                        <span class="appt-status">● {{ appt.status }}</span>
+                        
+                        <div style="margin-top: 10px;">
+                            <button onclick="window.print()" style="background: none; border: 1px solid #ccc; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">
+                                🖨️ Print
+                            </button>
+
+                            {% if appt.status == 'Pending' %}
+                                <a href="{{ url_for('cancel_appointment', appt_id=appt.id) }}" 
+                                   onclick="return confirm('Are you sure you want to cancel this appointment?');"
+                                   style="color: #dc3545; text-decoration: none; font-size: 0.8rem; margin-left: 5px; border: 1px solid #dc3545; padding: 4px 10px; border-radius: 5px; transition: 0.3s; display: inline-block;"
+                                   onmouseover="this.style.backgroundColor='#dc3545'; this.style.color='white';"
+                                   onmouseout="this.style.backgroundColor='transparent'; this.style.color='#dc3545';">
+                                    ✕ Cancel
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem;">
+                <p style="font-size: 1.2rem; color: var(--primary-color); margin-bottom: 1.5rem;">You haven't booked any appointments yet.</p>
+                <a href="{{ url_for('show_all_departments') }}" class="navbar__btn">Book Now</a>
+            </div>
+        {% endif %}
+        
+    </main>
+
+</body>
+</html>

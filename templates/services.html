@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Services - MedStar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <style>
+        .navbar__btn { font-family: "Poppins", sans-serif; color: var(--white-color); outline: none; border: none; padding: 0.7rem 1.8rem; border-radius: 25px; background: linear-gradient(to right, var(--dark-blue), var(--light-blue)); font-weight: 400; cursor: pointer; display: inline-block; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; }
+        .navbar__btn:hover { border: 1px solid var(--dark-blue); color: var(--dark-blue); background: transparent; }
+    
+        /* ================== (1) (هذا هو الستايل الجديد) ================== */
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: auto; 
+            background-color: var(--very-light-blue);
+        }
+
+        main.services-wrapper {
+            padding: 3rem 2rem; 
+            min-height: calc(100vh - 80px); 
+            box-sizing: border-box;
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+        }
+
+        .service-accordion-container {
+            display: flex; 
+            height: 70vh; 
+            width: 100%;
+            max-width: 1200px; 
+            border-radius: 15px; 
+            overflow: hidden; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            gap: 1rem; 
+            background-color: #fff; 
+            padding: 1rem;
+        }
+
+        .service-panel {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative; 
+            height: 100%; 
+            transition: all 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55); 
+            flex: 1; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            border: 2px solid rgba(255, 255, 255, 0.8); /* (الفريم الأبيض) */
+            
+            /* (عشان نحط الكلام في النص) */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #panel-lab { background-image: url("{{ url_for('static', filename='img/lab_background.jpg') }}"); }
+        #panel-radiology { background-image: url("{{ url_for('static', filename='img/radiology_background.jpg') }}"); }
+        #panel-psychotherapy { background-image: url("{{ url_for('static', filename='img/therapy_background.jpg') }}"); }
+        #panel-physical-therapy { background-image: url("{{ url_for('static', filename='img/physical_therapy_background.jpg') }}"); }
+
+
+        .service-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            transition: all 0.5s ease;
+        }
+
+        /* ================== (هنا التعديل) ================== */
+        
+        /* (ده "الكونتينر" اللي شايل الكلام، عشان يبقوا فوق بعض بالظبط) */
+        .panel-container {
+             position: relative;
+             width: 80%;
+             text-align: center;
+             z-index: 2; /* (عشان ييجي فوق الطبقة الغامقة) */
+        }
+
+        /* (ده "الكلام" اللي بيظهر) */
+        .panel-content {
+            position: absolute; /* (هيبقى فوق العنوان) */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* (في النص بالظبط) */
+            width: 100%;
+            
+            color: #fff;
+            opacity: 0; /* (مخفي في البداية) */
+            transition: all 0.5s ease;
+        }
+        
+        .panel-content h3 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--light-blue); 
+            text-shadow: 0 0 10px rgba(0,0,0,0.8); 
+        }
+        .panel-content p {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            max-width: 400px;
+            text-shadow: 0 0 5px rgba(0,0,0,0.7); 
+            margin-left: auto; 
+            margin-right: auto; 
+        }
+
+        /* (ده "العنوان" اللي بيختفي) */
+        .panel-title-wrapper {
+             position: relative; /* (هيبقى تحت الكلام) */
+             opacity: 1; /* (ظاهر في البداية) */
+             transition: all 0.5s ease;
+        }
+        .panel-title {
+            background: rgba(0, 0, 0, 0.3); 
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            color: #fff;
+            font-size: 2rem; 
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8); 
+            display: inline-block; /* (عشان الخلفية تيجي على قده) */
+        }
+        
+        /* ============ (تأثير الـ Hover) ============ */
+        
+        .service-accordion-container:hover .service-panel {
+            flex: 1; 
+        }
+        
+        .service-panel:hover {
+            flex: 4; 
+        }
+        
+        .service-panel:hover::before {
+             background: rgba(0,0,0,0.7); 
+        }
+
+        /* (لما نعمل "Hover"، اعكس الشفافية) */
+        .service-panel:hover .panel-content {
+            opacity: 1; /* (اظهر الكلام) */
+        }
+        .service-panel:hover .panel-title-wrapper {
+            opacity: 0; /* (اخفي العنوان) */
+        }
+        /* ================== (انتهى الستايل الجديد) ================== */
+
+        @media screen and (max-width: 900px) {
+            main.services-wrapper {
+                padding: 1rem;
+                height: auto;
+            }
+            .service-accordion-container {
+                flex-direction: column;
+                height: auto;
+                min-height: auto;
+                gap: 1rem; 
+                background: transparent; 
+                padding: 0;
+                box-shadow: none;
+            }
+            .service-panel {
+                flex: 1 !important; 
+                height: 50vh; 
+                border-radius: 10px !important; 
+                border: 2px solid rgba(255, 255, 255, 0.8);
+            }
+            /* (في الموبايل، اظهر الاتنين) */
+            .panel-content { opacity: 1; position: relative; transform: translateY(0); }
+            .panel-title-wrapper { opacity: 0; display: none; } /* (اخفي العنوان الثابت خالص) */
+        }
+
+    </style>
+</head>
+<body>
+    
+    <header>
+       <nav class="navbar">
+        <div class="navbar__container container">   
+            <div class="navbar__logo">
+                <a href="{{ url_for('home') }}"><h3>Med<span>Star</span></h3></a>
+                <img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt="logo-icon">
+            </div>
+           <ul class="navbar__links" id="navbar">
+            <li> <a href="{{ url_for('home') }}">Home</a></li>
+            <li> <a href="{{ url_for('show_services') }}">Services</a></li>
+            <!-- <li> <a href="{{ url_for('show_all_departments') }}">Departments</a></li> -->
+            <li> <a href="{{ url_for('my_appointments') }}">Appointments</a></li>
+            <li> <a href="{{ url_for('show_about') }}">About</a></li>
+            <li> <a href="{{ url_for('show_contact') }}">Contact</a></li>
+        </ul>
+            
+            {% if current_user.is_authenticated %}
+                <span style="color: var(--secondary-color); margin-right: 1rem;">Welcome, {{ current_user.username }}!</span>
+                <form action="{{ url_for('logout') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Logout</button>
+                </form>
+            {% else %}
+                <form action="{{ url_for('login') }}" method="GET" style="margin: 0; margin-right: 0.5rem;">
+                    <button type="submit" class="navbar__btn">Login or Sign UP</button>
+                </form>
+                <!-- <form action="{{ url_for('register') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Register</button>
+                </form> -->
+            {% endif %}
+
+        </div>
+       </nav>
+     </header>
+    
+    <main class="services-wrapper">
+        
+        <div class="service-accordion-container">
+            
+            <div id="panel-lab" class="service-panel">
+                <div class="panel-container">
+                    <div class="panel-title-wrapper">
+                        <h3 class="panel-title">Laboratory</h3>
+                    </div>
+                    <div class="panel-content">
+                        <h3>Laboratory Tests</h3>
+                        <p>Get reliable and fast results for all your medical lab tests from our certified partners. From routine blood work to specialized panels.</p>
+                        <a href="{{ url_for('show_lab_tests') }}" class="navbar__btn">View Lab Tests</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="panel-radiology" class="service-panel">
+                <div class="panel-container">
+                    <div class="panel-title-wrapper">
+                        <h3 class="panel-title">Radiology</h3>
+                    </div>
+                    <div class="panel-content">
+                        <h3>Radiology Center</h3>
+                        <p>Book X-rays, MRIs, and CT-scans using our advanced imaging technology and get your reports analyzed by top specialists.</p>
+                        <a href="{{ url_for('show_radiology') }}" class="navbar__btn">Book Scans</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="panel-psychotherapy" class="service-panel">
+                <div class="panel-container">
+                    <div class="panel-title-wrapper">
+                        <h3 class="panel-title">Psycho Therapy</h3>
+                    </div>
+                    <div class="panel-content">
+                        <h3>Mental Wellness</h3>
+                        <p>Confidential sessions with certified therapists and psychologists to support your mental and emotional well-being.</p>
+                        <a href="{{ url_for('show_psychotherapy') }}" class="navbar__btn">Book Session</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="panel-physical-therapy" class="service-panel">
+                <div class="panel-container">
+                    <div class="panel-title-wrapper">
+                        <h3 class="panel-title">Physical Therapy</h3>
+                    </div>
+                    <div class="panel-content">
+                        <h3>Physical Therapy</h3>
+                        <p>Specialized physical therapy sessions to help you recover from injury, manage pain, and regain full mobility.</p>
+                        <a href="{{ url_for('show_physical_therapy') }}" class="navbar__btn">Book Session</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>

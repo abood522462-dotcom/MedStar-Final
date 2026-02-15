@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Consultation - MedStar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <style>
+        /* (نفس الستايل بتاعك) */
+        .navbar__btn { font-family: "Poppins", sans-serif; color: var(--white-color); outline: none; border: none; padding: 0.7rem 1.8rem; border-radius: 25px; background: linear-gradient(to right, var(--dark-blue), var(--light-blue)); font-weight: 400; cursor: pointer; display: inline-block; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; }
+        .navbar__btn:hover { border: 1px solid var(--dark-blue); color: var(--dark-blue); background: transparent; }
+        
+        body { background-color: var(--very-light-blue); }
+        .chat-container { max-width: 800px; margin: 2rem auto; background: #fff; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; height: 80vh; display: flex; flex-direction: column; }
+        .chat-header { background: linear-gradient(to right, var(--dark-blue), var(--light-blue)); padding: 1rem 1.5rem; color: white; display: flex; justify-content: space-between; align-items: center; }
+        .chat-body { flex: 1; padding: 1.5rem; overflow-y: auto; background: #f9f9f9; display: flex; flex-direction: column; gap: 1rem; }
+        .message { padding: 1rem; border-radius: 15px; max-width: 75%; line-height: 1.6; font-size: 1rem; }
+        .received { background: white; align-self: flex-start; border-bottom-left-radius: 0; border: 1px solid #eee; }
+        .sent { background: var(--dark-blue); color: white; align-self: flex-end; border-bottom-right-radius: 0; }
+        .chat-input { padding: 1.5rem; background: white; border-top: 1px solid #eee; display: flex; gap: 1rem; }
+        .chat-input input { flex: 1; padding: 1rem; border-radius: 30px; border: 1px solid #ddd; outline: none; font-family: "Poppins", sans-serif; }
+        .chat-input button { padding: 0 2rem; border-radius: 30px; }
+        
+        /* (زرار إعادة التشغيل الصغير) */
+        .restart-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+        .restart-btn:hover { background: rgba(255,255,255,0.4); }
+    </style>
+</head>
+<body>
+    <header>
+       <nav class="navbar">
+        <div class="navbar__container container">   
+            <div class="navbar__logo">
+                <a href="{{ url_for('home') }}"><h3>Med<span>Star</span></h3></a>
+                <img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt="logo-icon">
+            </div>
+            <ul class="navbar__links" id="navbar">
+            <li> <a href="{{ url_for('home') }}">Home</a></li>
+            <li> <a href="{{ url_for('show_services') }}">Services</a></li>
+            <!-- <li> <a href="{{ url_for('show_all_departments') }}">Departments</a></li> -->
+            <li> <a href="{{ url_for('my_appointments') }}">Appointments</a></li>
+            <li> <a href="{{ url_for('show_about') }}">About</a></li>
+            <li> <a href="{{ url_for('show_contact') }}">Contact</a></li>
+            </ul>
+            
+            {% if current_user.is_authenticated %}
+                <span style="color: var(--secondary-color); margin-right: 1rem;">Welcome, {{ current_user.username }}!</span>
+                <form action="{{ url_for('logout') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Logout</button>
+                </form>
+            {% else %}
+                <form action="{{ url_for('login') }}" method="GET" style="margin: 0; margin-right: 0.5rem;">
+                    <button type="submit" class="navbar__btn">Login or Sign UP</button>
+                </form>
+                <!-- <form action="{{ url_for('register') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Register</button>
+                </form> -->
+            {% endif %}
+        </div>
+       </nav>
+     </header>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <div>
+                <h2 style="margin:0; font-size: 1.5rem;">AI Assistant 🤖</h2>
+                <p style="margin:0; font-size: 0.8rem; opacity: 0.9;">Symptom Checker</p>
+            </div>
+            <a href="{{ url_for('reset_chat') }}" class="navbar__btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; text-decoration: none;">
+    ↻ New Chat
+</a>
+</a>
+        </div>
+        
+        <div class="chat-body" id="chatBody">
+            {% for msg in chat_history %}
+                <div class="message {{ msg.type }}">
+                    {{ msg.text | safe }}
+                </div>
+            {% endfor %}
+        </div>
+        
+        <form class="chat-input" method="POST">
+            <input type="text" name="symptom_text" placeholder="e.g., I have a headache..." required autocomplete="off" autofocus>
+            <button type="submit" class="navbar__btn" style="padding: 0 2rem;">Send</button>
+        </form>
+    </div>
+
+    <script>
+        var chatBody = document.getElementById("chatBody");
+        chatBody.scrollTop = chatBody.scrollHeight;
+    </script>
+</body>
+</html>

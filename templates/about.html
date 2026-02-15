@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - MedStar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <style>
+        .navbar__btn { font-family: "Poppins", sans-serif; color: var(--white-color); outline: none; border: none; padding: 0.7rem 1.8rem; border-radius: 25px; background: linear-gradient(to right, var(--dark-blue), var(--light-blue)); font-weight: 400; cursor: pointer; display: inline-block; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; }
+        .navbar__btn:hover { border: 1px solid var(--dark-blue); color: var(--dark-blue); background: transparent; }
+    
+        /* ================== (1) (هذا هو الستايل الجديد) ================== */
+        
+        body, html {
+            height: 100%; 
+            overflow: hidden; 
+            background-color: var(--very-light-blue); 
+        }
+
+        .about-page-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 80px); 
+            padding: 2rem;
+            box-sizing: border-box; 
+        }
+
+        .about-tabbed-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 900px; 
+            height: 100%;
+            max-height: 600px; 
+            display: flex; 
+            flex-direction: column;
+        }
+
+        /* (1. شريط التابات اللي فوق) */
+        .tab-navigation {
+            display: flex;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .tab-navigation label {
+            flex: 1; 
+            text-align: center;
+            padding: 1.5rem 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-navigation label::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; 
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--dark-blue);
+            transform: scaleX(0); 
+            transition: transform 0.3s ease;
+        }
+
+        /* (2. المحتوى اللي تحت) */
+        .tab-content-wrapper {
+            padding: 2.5rem;
+            overflow-y: auto; 
+            flex-grow: 1;
+        }
+        
+        /* ================== (هنا التعديل) ================== */
+        .tab-content {
+            display: none; 
+            text-align: center; /* (ده هيخلي كل حاجة في النص) */
+        }
+        .tab-content h3, .tab-content p {
+            max-width: 700px; /* (هيدي البراجرافات عرض مناسب) */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        /* ================== (انتهى التعديل) ================== */
+
+        
+        .tab-content h3 {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab-content p, .tab-content li {
+            color: var(--primary-color);
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* (هنخلي الليستة نفسها في النص، بس الكلام جواها شمال) */
+        .feature-list { 
+            list-style-type: none; 
+            padding-left: 0; 
+            display: inline-block; /* (عشان الليستة تيجي في النص) */
+            margin: auto;
+            text-align: left; /* (عشان الأيقونة والكلام يبقوا على الشمال) */
+            max-width: 450px; /* (نديها عرض مناسب) */
+        }
+        .feature-list li { display: flex; align-items: flex-start; margin-bottom: 1rem; }
+        .feature-list img { width: 25px; height: 25px; margin-right: 1rem; margin-top: 5px; }
+        .feature-list h4 { margin: 0; color: var(--secondary-color); }
+        .feature-list p { 
+            font-size: 0.9rem; 
+            margin: 0; 
+            text-align: left; /* (نتأكد إن البراجراف ده على الشمال) */
+        }
+
+
+        /* (3. السحر بتاع الـ CSS) */
+        .tab-radio {
+            display: none; 
+        }
+        
+        .tab-radio:checked + .tab-label {
+            color: var(--dark-blue); 
+        }
+        .tab-radio:checked + .tab-label::after {
+            transform: scaleX(1); 
+        }
+        
+        #tab1:checked ~ .tab-content-wrapper #content1,
+        #tab2:checked ~ .tab-content-wrapper #content2,
+        #tab3:checked ~ .tab-content-wrapper #content3 {
+            display: block; 
+        }
+
+        @media screen and (max-width: 900px) {
+            body, html { overflow: auto; height: auto; } 
+            .about-page-wrapper {
+                height: auto;
+                padding: 1rem;
+            }
+            .about-tabbed-card {
+                height: auto;
+                max-height: none;
+            }
+            .tab-navigation {
+                flex-direction: column; 
+            }
+        }
+
+    </style>
+</head>
+<body>
+    
+    <header>
+       <nav class="navbar">
+        <div class="navbar__container container">   
+            <div class="navbar__logo">
+                <a href="{{ url_for('home') }}"><h3>Med<span>Star</span></h3></a>
+                <img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt="logo-icon">
+            </div>
+            <ul class="navbar__links" id="navbar">
+            <li> <a href="{{ url_for('home') }}">Home</a></li>
+            <li> <a href="{{ url_for('show_services') }}">Services</a></li>
+            <!-- <li> <a href="{{ url_for('show_all_departments') }}">Departments</a></li> -->
+            <li> <a href="{{ url_for('my_appointments') }}">Appointments</a></li>
+            <li> <a href="{{ url_for('show_about') }}">About</a></li>
+            <li> <a href="{{ url_for('show_contact') }}">Contact</a></li>
+            </ul>
+            
+            {% if current_user.is_authenticated %}
+                <span style="color: var(--secondary-color); margin-right: 1rem;">Welcome, {{ current_user.username }}!</span>
+                <form action="{{ url_for('logout') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Logout</button>
+                </form>
+            {% else %}
+                <form action="{{ url_for('login') }}" method="GET" style="margin: 0; margin-right: 0.5rem;">
+                    <button type="submit" class="navbar__btn">Login or Sign UP</button>
+                </form>
+                <!-- <form action="{{ url_for('register') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Register</button>
+                </form> -->
+            {% endif %}
+        </div>
+       </nav>
+     </header>
+    
+    <main class="about-page-wrapper">
+        
+        <div class="about-tabbed-card">
+            
+            <input type="radio" name="tabs" id="tab1" class="tab-radio" checked>
+            <input type="radio" name="tabs" id="tab2" class="tab-radio">
+            <input type="radio" name="tabs" id="tab3" class="tab-radio">
+
+            <nav class="tab-navigation">
+                <label for="tab1" class="tab-label">About Us</label>
+                <label for="tab2" class="tab-label">Our Services</label>
+                <label for="tab3" class="tab-label">Our Technology</label>
+            </nav>
+
+            <div class="tab-content-wrapper">
+                
+                <div id="content1" class="tab-content">
+                    <h3>About <span class="gradient-color">MedStar</span></h3>
+                    <p>
+                        <strong>MedStar</strong> is a graduation project designed to revolutionize the healthcare experience. Our mission is to bridge the gap between patients and specialized medical care through intelligent, user-friendly technology.
+                    </p>
+                    <p>
+                        This platform was built to ensure you get the right care, right away. We aim to be your complete health ecosystem, from initial consultation to booking appointments with our 30+ specialists.
+                    </p>
+                </div>
+                
+                <div id="content2" class="tab-content">
+                    <h3>Our <span class="gradient-color">Services</span></h3>
+                    <ul class="feature-list">
+                        <li>
+                            <img src="{{ url_for('static', filename='img/icon_ai.png') }}" alt="AI Icon">
+                            <div>
+                                <h4>AI Symptom Analyzer</h4>
+                                <p>An intelligent system to analyze your symptoms and recommend the correct medical department.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <img src="{{ url_for('static', filename='img/icon_booking.png') }}" alt="Booking Icon">
+                            <div>
+                                <h4>Smart Booking System</h4>
+                                <p>Book appointments and prevent double-booking conflicts.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <img src="{{ url_for('static', filename='img/icon_services.png') }}" alt="Services Icon">
+                            <div>
+                                <h4>Integrated Services</h4>
+                                <p>Connect your appointments with our network of Labs, Radiology, and Therapy centers.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="content3" class="tab-content">
+                    <h3>Our <span class="gradient-color">Technology</span></h3>
+                    <ul class="feature-list">
+                        <li>
+                            <img src="{{ url_for('static', filename='img/icon_python.png') }}" alt="Python Icon">
+                            <div>
+                                <h4>Python & Flask</h4>
+                                <p>A fast, scalable, and secure backend built with Flask to handle all logic and requests.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <img src="{{ url_for('static', filename='img/icon_database.png') }}" alt="Database Icon">
+                            <div>
+                                <h4>SQLAlchemy Database</h4>
+                                <p>A robust database managing users, doctors, departments, and complex bookings.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <img src="{{ url_for('static', filename='img/icon_login.png') }}" alt="Login Icon">
+                            <div>
+                                <h4>Secure Authentication</h4>
+                                <p>A complete User Login & Registration system using Flask-Login to protect user data.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+        </main>
+
+</body>
+</html>

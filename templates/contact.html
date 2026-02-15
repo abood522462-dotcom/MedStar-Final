@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact & Reviews - MedStar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* (نفس الستايل السابق) */
+        .navbar__btn { font-family: "Poppins", sans-serif; color: var(--white-color); outline: none; border: none; padding: 0.7rem 1.8rem; border-radius: 25px; background: linear-gradient(to right, var(--dark-blue), var(--light-blue)); font-weight: 400; cursor: pointer; display: inline-block; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; }
+        .navbar__btn:hover { border: 1px solid var(--dark-blue); color: var(--dark-blue); background: transparent; }
+        body { background-color: var(--very-light-blue); }
+        .contact-wrapper { padding: 4rem 2rem; max-width: 1100px; margin: auto; }
+        .contact-header { text-align: center; margin-bottom: 3rem; }
+        .contact-header h2 { font-size: 2.5rem; color: var(--secondary-color); }
+        .info-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 4rem; }
+        .info-card { background: white; padding: 2rem; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
+        .contact-form-container { background: white; padding: 3rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); display: flex; gap: 2rem; margin-bottom: 4rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: var(--secondary-color); }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+
+        /* (ستايل النجوم) */
+        .rating { display: flex; flex-direction: row-reverse; justify-content: flex-end; }
+        .rating input { display: none; }
+        .rating label { font-size: 2rem; color: #ccc; cursor: pointer; transition: 0.2s; }
+        .rating input:checked ~ label, .rating label:hover, .rating label:hover ~ label { color: #f1c40f; }
+
+        /* (ستايل عرض التقييمات) */
+        .reviews-section h3 { text-align: center; color: var(--dark-blue); margin-bottom: 2rem; font-size: 2rem; }
+        .reviews-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+        .review-card { background: white; padding: 1.5rem; border-radius: 10px; border-left: 4px solid var(--light-blue); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .review-stars { color: #f1c40f; font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .review-text { font-style: italic; color: #555; margin-bottom: 1rem; }
+        .review-author { font-weight: bold; color: var(--dark-blue); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <header><nav class="navbar"><div class="navbar__container container"><div class="navbar__logo"><a href="{{ url_for('home') }}"><h3>Med<span>Star</span></h3></a></div><ul class="navbar__links"><li><a href="{{ url_for('home') }}">Home</a></li><li><a href="{{ url_for('show_contact') }}">Contact</a></li></ul></div></nav></header>
+
+    <main class="contact-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div style="text-align: center; margin-bottom: 2rem;">
+                {% for category, message in messages %}
+                    <div style="padding: 1rem; background-color: #d4edda; color: #155724; border-radius: 5px; display: inline-block;">{{ message }}</div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="contact-header">
+            <h2>Rate Our <span class="gradient-color">Service</span></h2>
+            <p>We value your feedback. Leave a review below.</p>
+        </div>
+
+        <div class="contact-form-container">
+            <div style="flex:1;">
+                <img src="{{ url_for('static', filename='img/hero.png') }}" style="width: 100%;">
+            </div>
+            <div style="flex:1;">
+                <form method="POST">
+                    <div class="form-group">
+                        <label>Your Name</label>
+                        <input type="text" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Rating</label>
+                        <div class="rating">
+                            <input type="radio" name="rating" value="5" id="5"><label for="5">★</label>
+                            <input type="radio" name="rating" value="4" id="4"><label for="4">★</label>
+                            <input type="radio" name="rating" value="3" id="3"><label for="3">★</label>
+                            <input type="radio" name="rating" value="2" id="2"><label for="2">★</label>
+                            <input type="radio" name="rating" value="1" id="1"><label for="1">★</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Review / Message</label>
+                        <textarea name="message" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="navbar__btn">Submit Review</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="reviews-section">
+            <h3>Patient Reviews</h3>
+            <div class="reviews-grid">
+                {% for review in reviews %}
+                <div class="review-card">
+                    <div class="review-stars">
+                        {% for i in range(review.rating) %}★{% endfor %}
+                    </div>
+                    <p class="review-text">"{{ review.message_text }}"</p>
+                    <p class="review-author">- {{ review.name }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

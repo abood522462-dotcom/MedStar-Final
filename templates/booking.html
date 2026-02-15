@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - MedStar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <style>
+        .navbar__btn { font-family: "Poppins", sans-serif; color: var(--white-color); outline: none; border: none; padding: 0.7rem 1.8rem; border-radius: 25px; background: linear-gradient(to right, var(--dark-blue), var(--light-blue)); font-weight: 400; cursor: pointer; display: inline-block; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; }
+        .navbar__btn:hover { border: 1px solid var(--dark-blue); color: var(--dark-blue); background: transparent; }
+        
+        /* ================== (1) (هذا هو الستايل الجديد) ================== */
+        
+        body {
+            background-color: var(--very-light-blue); 
+        }
+
+        .booking-page-container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr; /* (الفورم أعرض شوية) */
+            min-height: calc(100vh - 80px); /* (عشان يملى الصفحة تحت الهيدر) */
+            max-width: 1440px;
+            margin: auto;
+        }
+
+        /* --- (العمود الشمال: معلومات الدكتور) --- */
+        .doctor-profile-column {
+            background: #fff;
+            padding: 4rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow-y: auto; 
+            position: relative; /* (عشان اللوجو) */
+        }
+        
+        .booking-logo {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            text-decoration: none;
+        }
+        .booking-logo h3 {
+            font-size: 1.7rem;
+            color: var(--secondary-color);
+        }
+         .booking-logo span {
+            font-weight: 600;
+         }
+
+        .doctor-profile-column img {
+            width: 150px; 
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 1.5rem;
+            border: 5px solid var(--light-blue);
+        }
+
+        .doctor-profile-column h2 {
+            color: var(--secondary-color);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .doctor-profile-column .rank {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 0.25rem;
+        }
+        
+        .doctor-profile-column .specialty {
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        /* --- (العمود اليمين: الفورم) --- */
+        .booking-form-column {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            overflow-y: auto; 
+        }
+
+        .booking-form {
+            background: #fff;
+            padding: 2.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px; 
+            box-sizing: border-box;
+        }
+        
+        .booking-form h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--secondary-color);
+        }
+        
+        .form-group { margin-bottom: 1.5rem; }
+        
+        .form-group label { 
+            display: block; 
+            margin-bottom: 1rem; 
+            color: var(--secondary-color); 
+            font-weight: 500; 
+        }
+        
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; 
+            padding: 0.8rem; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            box-sizing: border-box; 
+            font-family: "Poppins", sans-serif; 
+        }
+        
+        .booking-form button { width: 100%; padding: 0.8rem; }
+
+        /* (الستايل الجديد بتاع "ملخص الحجز") */
+        .booking-summary {
+            background-color: var(--very-light-blue);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .booking-summary p {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+        .booking-summary strong {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+        
+        /* (الستايل الجديد بتاع "خطوات الفورم") */
+        .form-step {
+            border-top: 1px solid #eee;
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .form-step > label { /* (العنوان بتاع الخطوة) */
+             font-size: 1.1rem;
+             font-weight: 700;
+             color: var(--secondary-color);
+        }
+
+        /* (الخانة اللي مينفعش تتعدل) */
+        .form-group input[readonly] {
+            background-color: #f4f4f4;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        /* ================== (انتهى الستايل الجديد) ================== */
+
+        @media screen and (max-width: 900px) {
+            .booking-page-container {
+                grid-template-columns: 1fr; 
+                min-height: auto; 
+            }
+            .doctor-profile-column {
+                min-height: auto;
+                padding: 2rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    
+    <header>
+       <nav class="navbar">
+        <div class="navbar__container container">   
+            <div class="navbar__logo">
+                <a href="{{ url_for('home') }}"><h3>Med<span>Star</span></h3></a>
+                <img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt="logo-icon">
+            </div>
+            <ul class="navbar__links" id="navbar">
+            <li> <a href="{{ url_for('home') }}">Home</a></li>
+            <li> <a href="{{ url_for('show_services') }}">Services</a></li>
+            <!-- <li> <a href="{{ url_for('show_all_departments') }}">Departments</a></li> -->
+            <li> <a href="{{ url_for('my_appointments') }}">Appointments</a></li>
+            <li> <a href="{{ url_for('show_about') }}">About</a></li>
+            <li> <a href="{{ url_for('show_contact') }}">Contact</a></li>
+            </ul>
+            
+            {% if current_user.is_authenticated %}
+                <span style="color: var(--secondary-color); margin-right: 1rem;">Welcome, {{ current_user.username }}!</span>
+                <form action="{{ url_for('logout') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Logout</button>
+                </form>
+            {% else %}
+                <form action="{{ url_for('login') }}" method="GET" style="margin: 0; margin-right: 0.5rem;">
+                    <button type="submit" class="navbar__btn">Login</button>
+                <!-- </form>
+                <form action="{{ url_for('register') }}" method="GET" style="margin: 0;">
+                    <button type="submit" class="navbar__btn">Register</button>
+                </form> -->
+            {% endif %}
+
+        </div>
+       </nav>
+     </header>
+
+    <main>
+        <div class="booking-page-container">
+            
+            <div class="doctor-profile-column">
+                <img src="{{ url_for('static', filename='img/' + doctor.image_url) }}" alt="{{ doctor.name }}">
+                <p class="rank">{{ doctor.rank }}</p>
+                <h2>{{ doctor.name }}</h2>
+                <p class="specialty">{{ doctor.specialty }} ({{ doctor.department.name }})</p>
+            </div>
+            <div class="booking-form-column">
+                <form class="booking-form" method="POST">
+                    <h2>Confirm Your Appointment</h2>
+        
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div style="padding: 1rem; margin-bottom: 1rem; border-radius: 5px; background-color: {% if category == 'danger' %}#f8d7da{% else %}#d4edda{% endif %}; color: {% if category == 'danger' %}#721c24{% else %}#155724{% endif %};">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <!-- <div class="booking-summary">
+                        <p>You are booking:</p>
+                        <p><strong>Doctor:</strong> {{ doctor.name }}</p>
+                        <p><strong>Department:</strong> {{ doctor.department.name }}</p>
+                    </div> -->
+
+                    <div class="form-step">
+                        <label><strong>Step 1: Select Date & Time</strong></label>
+                        <div class="form-group">
+                            <!-- <label for="date">Select Date</label> -->
+                            <input type="date" id="date" name="date" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="time">Select Time</label>
+                            <input type="time" id="time" name="time" required>
+                        </div>
+                        </div>
+
+                    <div class="form-step">
+                        <label><strong>Step 2: Add Your Information</strong></label>
+                        <div class="form-group">
+                            <!-- <label for="visit_type">Visit Type</label> -->
+                            <select name="visit_type" id="visit_type">
+                                <option value="First Visit">First Visit</option>
+                                <option value="Follow-up">Follow-up </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reason">Reason for Visit (Optional)</label>
+                            <textarea name="reason" id="reason" rows="3"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- <div class="form-step">
+                        <label><strong>Step 3: Confirm Patient</strong></label>
+                        <div class="form-group">
+                            <label for="patient_name">Booking for:</label>
+                            <input type="text" id="patient_name" name="patient_name" value="{{ current_user.username }}" readonly>
+                        </div>
+                    </div> -->
+
+                    <button type="submit" style="margin-top: 1rem;">Confirm Booking</button>
+                </form>
+            </div>
+            </div>
+    </main>
+<script>
+    // كود لمنع اختيار تاريخ قديم
+    document.addEventListener('DOMContentLoaded', function() {
+        var dateInput = document.getElementById('date');
+        if(dateInput) {
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var yyyy = today.getFullYear();
+
+            today = yyyy + '-' + mm + '-' + dd;
+            dateInput.setAttribute("min", today);
+        }
+    });
+</script>
+</body>
+</html>
