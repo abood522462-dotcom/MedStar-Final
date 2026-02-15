@@ -10,7 +10,7 @@ import google.generativeai as genai
 # --- إعدادات Gemini AI ---
 GEMINI_API_KEY = "AIzaSyB0xTDwW71QdWdjOR2ykIWw5XwI9-SMWh8" 
 try:
-    genai.configure(api_key=GEMINI_API_KEY)
+    genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
     # في ملف app.py سطر 12
     model = genai.GenerativeModel('gemini-flash-latest')
 except:
